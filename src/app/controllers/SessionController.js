@@ -1,9 +1,20 @@
 import jwt from 'jsonwebtoken';
+import * as Yup from 'yup';
 import User from '../models/User';
 import authConfig from '../../config/auth';
 
-class SessionCrontroller {
+class SessionController {
   async store(req, res) {
+    // objeto que irá determinar formato dados de entrada
+    const schema = Yup.object().shape({
+      email: Yup.string().required(),
+      password: Yup.string().required(),
+    });
+
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'Validation fails' });
+    }
+
     const { email, password } = req.body;
 
     const user = await User.findOne({ where: { email } });
@@ -21,7 +32,6 @@ class SessionCrontroller {
     }
 
     const { id, name } = user;
-
     // pay loader jwt
     return res.json({
       user: {
@@ -29,7 +39,7 @@ class SessionCrontroller {
         name,
         email,
       },
-      // token criado no site md5online.org e configurado no arquivo src>config>auth.js
+      // token criado no site md5online.org
       token: jwt.sign({ id }, authConfig.secret, {
         expiresIn: authConfig.expiresIn,
       }),
@@ -37,4 +47,4 @@ class SessionCrontroller {
   }
 }
 
-export default new SessionCrontroller();
+export default new SessionController();
