@@ -1,18 +1,22 @@
 import jwt from 'jsonwebtoken';
+
 import * as Yup from 'yup';
+
 import User from '../models/User';
+
 import authConfig from '../../config/auth';
 
 class SessionController {
   async store(req, res) {
-    // objeto que irá determinar formato dados de entrada
     const schema = Yup.object().shape({
-      email: Yup.string().required(),
+      email: Yup.string()
+        .email()
+        .required(),
       password: Yup.string().required(),
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
+      return res.status(400).json({ error: 'Validation Fails' });
     }
 
     const { email, password } = req.body;
@@ -20,26 +24,21 @@ class SessionController {
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      return res.status(401).json({ error: 'user not found' });
+      return res.status(401).json({ error: 'User Not Found' });
     }
 
-    /*
-    utilizando método checkPassword do model User
-    para validar se senha existe e está correta
-    */
     if (!(await user.checkPassword(password))) {
-      return res.status(401).json({ error: 'Password does not match' });
+      return res.status(401).json({ error: 'Password does not Match' });
     }
 
     const { id, name } = user;
-    // pay loader jwt
+
     return res.json({
       user: {
         id,
         name,
         email,
       },
-      // token criado no site md5online.org
       token: jwt.sign({ id }, authConfig.secret, {
         expiresIn: authConfig.expiresIn,
       }),

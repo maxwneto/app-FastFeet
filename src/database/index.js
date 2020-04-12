@@ -1,13 +1,12 @@
-// responsável for fazer conexão com banco
 import Sequelize from 'sequelize';
 
-// importar models
 import User from '../app/models/User';
 
-// importar configurações do banco de dados
-import databaseConfig from '../config/database';
+import Recipient from '../app/models/Recipient';
 
-const models = [User];
+import configDatabase from '../config/database';
+
+const models = [User, Recipient];
 
 class Database {
   constructor() {
@@ -15,10 +14,9 @@ class Database {
   }
 
   init() {
-    // variável cria conexão com o banco de dados
-    this.connection = new Sequelize(databaseConfig);
+    this.connection = new Sequelize(configDatabase);
 
-    models.map((model) => model.init(this.connection));
+    models.map(model => model.init(this.connection));
   }
 }
 

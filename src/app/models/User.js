@@ -9,27 +9,13 @@ class User extends Model {
         email: Sequelize.STRING,
         password: Sequelize.VIRTUAL,
         password_hash: Sequelize.STRING,
-        provider: Sequelize.BOOLEAN,
       },
       {
         sequelize,
       }
     );
-
-    this.addHook('beforeSave', async (user) => {
-      if (user.password) {
-        user.password_hash = await bcrypt.hash(user.password, 8);
-      }
-    });
-
-    return this;
   }
 
-  /*
-  metodo para verificar se a senha do usuário está correta
-  se a senha for igual ele retorna true
-  e senão retorna falsa
-  */
   checkPassword(password) {
     return bcrypt.compare(password, this.password_hash);
   }
