@@ -10,7 +10,7 @@ class RecipientController {
       complement: Yup.string(),
       state: Yup.string().required(),
       city: Yup.string().required(),
-      zip_code: Yup.number().required(),
+      zip_code: Yup.string().required(),
     });
 
     if (!(await schema.isValid(req.body))) {
@@ -43,7 +43,7 @@ class RecipientController {
   async update(req, res) {
     const schema = Yup.object().shape({
       name: Yup.string(),
-      zip_code: Yup.number(),
+      zip_code: Yup.string(),
       street: Yup.string().when('zip_code', (zip_code, field) =>
         zip_code ? field.required() : field
       ),
